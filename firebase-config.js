@@ -2,7 +2,7 @@
 // 支援從 localStorage 讀取自訂 API Key，或直接使用此檔案中的預設設定
 
 export const DEFAULT_FIREBASE_CONFIG = {
-  apiKey: "", // 請在此填入您的 Firebase Web API Key，或在網頁介面中直接設定
+  apiKey: "AIzaSyD-dhf_6y7gwuk0KZQkG23EglrqSqOHwyE",
   authDomain: "my-to-do-list-c05a3.firebaseapp.com",
   projectId: "my-to-do-list-c05a3",
   storageBucket: "my-to-do-list-c05a3.firebasestorage.app",
