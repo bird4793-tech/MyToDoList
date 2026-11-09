@@ -1,13 +1,11 @@
 // Firebase 設定模組 - 專案: my-to-do-list-c05a3
-// 支援從 localStorage 讀取自訂 API Key，或直接使用此檔案中的預設設定
-
 export const DEFAULT_FIREBASE_CONFIG = {
   apiKey: "AIzaSyD-dhf_6y7gwuk0KZQkG23EglrqSqOHwyE",
   authDomain: "my-to-do-list-c05a3.firebaseapp.com",
   projectId: "my-to-do-list-c05a3",
   storageBucket: "my-to-do-list-c05a3.firebasestorage.app",
-  messagingSenderId: "",
-  appId: ""
+  messagingSenderId: "480419783475",
+  appId: "1:480419783475:web:134df4f549e79aafb15446"
 };
 
 const STORAGE_KEY = "mytodolist_firebase_config";
@@ -20,7 +18,13 @@ export function getFirebaseConfig() {
   if (saved) {
     try {
       const parsed = JSON.parse(saved);
-      return { ...DEFAULT_FIREBASE_CONFIG, ...parsed };
+      const merged = { ...DEFAULT_FIREBASE_CONFIG };
+      for (const key in parsed) {
+        if (parsed[key] && typeof parsed[key] === "string" && parsed[key].trim()) {
+          merged[key] = parsed[key].trim();
+        }
+      }
+      return merged;
     } catch (e) {
       console.warn("無法解析儲存的 Firebase 設定，使用預設值", e);
     }
@@ -43,10 +47,9 @@ export function resetFirebaseConfig() {
 }
 
 /**
- * 檢查當前設定是否有效（是否有填寫 apiKey）
+ * 檢查當前設定是否有效
  */
 export function isFirebaseConfigured() {
   const cfg = getFirebaseConfig();
   return Boolean(cfg.apiKey && cfg.apiKey.trim().length > 10);
 }
-
