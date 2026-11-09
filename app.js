@@ -228,10 +228,9 @@ async function initFirebase() {
     onAuthStateChanged(auth, (user) => {
       currentUser = user;
       updateAuthUI(user);
+      // 登入或登出時，重新啟動監聽以套用對應的身分權限
+      startTodosListener();
     });
-
-    // 啟動 Firestore 即時任務監聽
-    startTodosListener();
     return true;
   } catch (error) {
     console.error("Firebase 初始化失敗:", error);
@@ -365,8 +364,23 @@ function startTodosListener() {
   }, (error) => {
     console.error("Firestore 監聽錯誤:", error);
     todosLoading.classList.add('hidden');
-    setSyncStatus('error', '同步受阻');
-    showToast(`讀取資料錯誤: ${error.message}`, 'error');
+    todosEmpty.classList.remove('hidden');
+
+    if (error.code === 'permission-denied') {
+      if (!currentUser) {
+        setSyncStatus('idle', '請先登入 Google');
+        showToast('Firestore 設定為登入後存取，請點擊右上角「Google 登入」以載入待辦清單', 'warning');
+      } else {
+        setSyncStatus('error', '權限受限');
+        showToast('Firestore 規則權限不足：請至 Firebase 控制台將 Rules 設為允許存取', 'error');
+      }
+    } else if (error.code === 'unavailable' || error.message?.includes('offline') || error.code === 'not-found') {
+      setSyncStatus('error', '資料庫未建立');
+      showToast('請至 Firebase 控制台點擊「建立資料庫」以啟用 Firestore', 'error');
+    } else {
+      setSyncStatus('error', '同步受阻');
+      showToast(`同步錯誤 (${error.code || error.message})`, 'error');
+    }
   });
 }
 
